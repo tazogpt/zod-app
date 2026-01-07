@@ -18,7 +18,7 @@
   - 단일 백엔드 모듈
   - 모든 서버 코드는 `app/src` 하위에 위치
   - 도메인 분리는 **패키지 단위**로 수행
-- `site`
+- `war`
   - tomcat war 배포 모듈
 
 
@@ -41,5 +41,5 @@
 ## 3. 문서 적용 범위
 
 - Backend 규칙은 `app/AGENTS.md`를 따릅니다.
-- War 배포 규칙은 `site/AGENTS.md`를 따릅니다.
+- War 배포 규칙은 `war/AGENTS.md`를 따릅니다.
 - Frontend 규칙은 `web/AGENTS.md`를 따릅니다.

@@ -24,7 +24,7 @@ Backend는 다음과 같이 **도메인 중심 패키지 구조**를 가집니�
 
 ```text
 app/src/main/kotlin
- └─ pico
+ └─ zod
      ├─ api
      ├─ member
      ├─ payment
