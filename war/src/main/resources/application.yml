@@ -3,12 +3,14 @@ spring:
         name: zod
     config:
         import: application-dev.yml
+    main:
+        web-application-type: servlet
     thymeleaf:
         cache: false
         check-template-location: false
         encoding: UTF-8
         mode: HTML
 server:
-    port: 38080
+    port: 18080
     servlet:
         context-path: /
