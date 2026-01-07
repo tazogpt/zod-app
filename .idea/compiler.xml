@@ -9,5 +9,10 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="zod-app.app" options="-parameters -proc:none" />
+      <module name="zod-app.app.main" options="-parameters -proc:none" />
+      <module name="zod-app.app.test" options="-parameters -proc:none" />
+    </option>
   </component>
 </project>
