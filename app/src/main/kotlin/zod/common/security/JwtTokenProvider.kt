@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -17,10 +18,12 @@ import java.util.Date
 @Component
 class JwtTokenProvider(
     @Value("\${security.jwt.secret}") private val secret: String,
-    @Value("\${security.jwt.access}") private val accessSeconds: Long,
-    @Value("\${security.jwt.refresh}") private val refreshSeconds: Long,
+    @Value("\${security.jwt.access-mins}") private val accessMinutes: Long,
+    @Value("\${security.jwt.refresh-mins}") private val refreshMinutes: Long,
 ) {
-    private val secretKey = Keys.hmacShaKeyFor(secret.toByteArray())
+    private val secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret))
+    private val accessSeconds: Long = accessMinutes * 60
+    private val refreshSeconds: Long = refreshMinutes * 60
 
     fun createAccessToken(
         userid: String,
@@ -28,7 +31,7 @@ class JwtTokenProvider(
         role: String,
         level: Int,
     ): String {
-        return createToken(userid, nickname, role, level, accessSeconds)
+        return createAccessToken(userid, nickname, role, level, accessSeconds)
     }
 
     fun createRefreshToken(
@@ -61,7 +64,7 @@ class JwtTokenProvider(
         }
     }
 
-    private fun createToken(
+    private fun createAccessToken(
         userid: String,
         nickname: String,
         role: String,
@@ -77,7 +80,7 @@ class JwtTokenProvider(
             .claim("level", level)
             .issuedAt(now)
             .expiration(expiry)
-            .signWith(secretKey)
+            .signWith(secretKey, Jwts.SIG.HS512)
             .compact()
     }
 
@@ -91,7 +94,7 @@ class JwtTokenProvider(
             .subject(userid)
             .issuedAt(now)
             .expiration(expiry)
-            .signWith(secretKey)
+            .signWith(secretKey, Jwts.SIG.HS512)
             .compact()
     }
 

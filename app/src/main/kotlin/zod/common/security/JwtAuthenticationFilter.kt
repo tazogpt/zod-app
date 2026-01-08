@@ -1,17 +1,16 @@
 package zod.common.security
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.filter.OncePerRequestFilter
 import zod.common.error.exception.ApiException
-import zod.common.response.ApiResponse
 
 class JwtAuthenticationFilter(
     private val tokenProvider: JwtTokenProvider,
-    private val objectMapper: ObjectMapper,
+    private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -28,7 +27,7 @@ class JwtAuthenticationFilter(
             filterChain.doFilter(request, response)
         } catch (ex: ApiException) {
             SecurityContextHolder.clearContext()
-            writeErrorResponse(response, ex)
+            handlerExceptionResolver.resolveException(request, response, null, ex)
         }
     }
 
@@ -39,15 +38,6 @@ class JwtAuthenticationFilter(
         } else {
             null
         }
-    }
-
-    private fun writeErrorResponse(response: HttpServletResponse, ex: ApiException) {
-        val errorCode = ex.errorCode
-        response.status = errorCode.status.value()
-        response.contentType = "application/json"
-        response.characterEncoding = "UTF-8"
-        val body = ApiResponse.error(errorCode.name, errorCode.message)
-        response.writer.write(objectMapper.writeValueAsString(body))
     }
 
     companion object {

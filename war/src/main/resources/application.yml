@@ -16,6 +16,6 @@ server:
         context-path: /
 security:
     jwt:
-        secret: ${JWT_SECRET:change-me-change-me-change-me-change-me}
-        access: 900
-        refresh: 1209600
+        secret: ${JWT_SECRET:JffuxoG0ZivcKkw/nKTNn4RomIIv4/NVgrxZmN3hpXfXznfqGGuECDOaChKuqV6LXTdiUE/PCZrvskhYaacSVw==}
+        access-mins: 30
+        refresh-mins: 60
