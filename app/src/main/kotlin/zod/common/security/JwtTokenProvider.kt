@@ -1,4 +1,4 @@
-package zod.common.infra.security
+package zod.common.security
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
@@ -10,8 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
-import zod.common.api.error.ErrorCode
-import zod.common.api.error.exception.ApiException
+import zod.common.error.ErrorCode
+import zod.common.error.exception.ApiException
 import java.util.Date
 
 @Component

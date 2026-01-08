@@ -1,6 +1,6 @@
-package zod.common.api.error.exception
+package zod.common.error.exception
 
-import zod.common.api.error.ErrorCode
+import zod.common.error.ErrorCode
 
 class ApiException(
     val errorCode: ErrorCode,

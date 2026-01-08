@@ -3,9 +3,9 @@ package zod.member.application.command
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import zod.common.api.error.ErrorCode
-import zod.common.api.error.exception.ApiException
-import zod.common.infra.security.JwtTokenProvider
+import zod.common.error.ErrorCode
+import zod.common.error.exception.ApiException
+import zod.common.security.JwtTokenProvider
 import zod.member.domain.port.MemberQueryRepository
 import zod.member.domain.port.TokenCommandRepository
 import zod.member.domain.port.TokenQueryRepository

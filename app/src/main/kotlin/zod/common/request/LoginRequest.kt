@@ -1,4 +1,4 @@
-package zod.common.api.request
+package zod.common.request
 
 data class LoginRequest(
     val username: String,

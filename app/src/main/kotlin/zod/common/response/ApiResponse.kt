@@ -1,4 +1,4 @@
-package zod.common.api.response
+package zod.common.response
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

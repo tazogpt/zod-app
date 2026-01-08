@@ -1,4 +1,4 @@
-package zod.common.infra.config
+package zod.common.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
@@ -9,8 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import zod.common.infra.security.JwtAuthenticationFilter
-import zod.common.infra.security.JwtTokenProvider
+import zod.common.security.JwtAuthenticationFilter
+import zod.common.security.JwtTokenProvider
 
 @Configuration
 class SecConfig(

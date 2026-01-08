@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import zod.common.api.request.LoginRequest
-import zod.common.api.request.RefreshTokenRequest
-import zod.common.api.response.ApiResponse
-import zod.common.api.response.TokenResponse
+import zod.common.request.LoginRequest
+import zod.common.request.RefreshTokenRequest
+import zod.common.response.ApiResponse
+import zod.common.response.TokenResponse
 import zod.member.application.command.AuthService
 
 @RestController

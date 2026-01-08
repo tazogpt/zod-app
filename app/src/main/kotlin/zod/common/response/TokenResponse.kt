@@ -1,4 +1,4 @@
-package zod.common.api.response
+package zod.common.response
 
 data class TokenResponse(
     val accessToken: String,

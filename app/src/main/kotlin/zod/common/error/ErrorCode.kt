@@ -1,4 +1,4 @@
-package zod.common.api.error
+package zod.common.error
 
 import org.springframework.http.HttpStatus
 
