@@ -1,7 +1,7 @@
 package zod.common.infra.config
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -16,10 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @EnableTransactionManagement
 @EnableAsync
 @EnableScheduling
-class AppConfig(
-    @PersistenceContext
-    private val entityManager: EntityManager,
-) {
+class AppConfig {
 
     @Bean
     fun taskScheduler(): TaskScheduler {
@@ -46,4 +43,7 @@ class AppConfig(
             initialize()
         }
     }
+
+    @Bean
+    fun objectMapper(): ObjectMapper = jacksonObjectMapper()
 }

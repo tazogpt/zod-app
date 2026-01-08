@@ -14,3 +14,8 @@ server:
     port: 18080
     servlet:
         context-path: /
+security:
+    jwt:
+        secret: ${JWT_SECRET:change-me-change-me-change-me-change-me}
+        access: 900
+        refresh: 1209600
