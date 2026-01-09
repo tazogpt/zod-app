@@ -1,7 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const apiUrl = import.meta.dev
+const apiUrl = process.env.NODE_ENV === 'development'
     ? 'http://localhost:18080'
     : 'http://localhost:33080'
 

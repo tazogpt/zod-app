@@ -3,7 +3,7 @@ definePageMeta({
     layout: false
 })
 
-const username = ref('')
+const userid = ref('')
 const password = ref('')
 const isSubmitting = ref(false)
 const colorMode = useColorMode()
@@ -13,7 +13,7 @@ const toggleColorMode = () => {
 }
 
 const submitLogin = async () => {
-    if (!username.value || !password.value) {
+    if (!userid.value || !password.value) {
         alert('아이디와 비밀번호를 입력해 주세요.')
         return
     }
@@ -23,7 +23,7 @@ const submitLogin = async () => {
         await $fetch('/api/auth/login', {
             method: 'POST',
             body: {
-                username: username.value,
+                userid: userid.value,
                 password: password.value
             }
         })
@@ -73,9 +73,9 @@ const submitLogin = async () => {
                     <label class="flex flex-col gap-2 text-sm font-medium text-surface-700 dark:text-surface-200">
                         <span>아이디</span>
                         <input
-                            v-model="username"
+                            v-model="userid"
                             type="text"
-                            autocomplete="username"
+                            autocomplete="userid"
                             placeholder="아이디를 입력하세요"
                             class="rounded-xl border border-surface-200 bg-white px-4 py-3 text-base text-surface-900 placeholder:text-surface-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-50 dark:placeholder:text-surface-500 dark:focus:border-primary-400 dark:focus:ring-primary-500/40"
                         />
