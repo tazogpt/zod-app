@@ -41,9 +41,9 @@ dependencies {
 
     runtimeOnly("com.microsoft.sqlserver:mssql-jdbc")
 
-    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
-    kapt("com.querydsl:querydsl-apt:5.1.0:jakarta")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1")
+    kapt("io.github.openfeign.querydsl:querydsl-apt:7.1:jakarta")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(kotlin("test"))

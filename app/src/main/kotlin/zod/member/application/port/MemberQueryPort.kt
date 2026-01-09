@@ -1,4 +1,4 @@
-package zod.member.domain.port
+package zod.member.application.port
 
 import zod.member.application.dto.MemberDto
 

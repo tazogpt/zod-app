@@ -1,7 +1,7 @@
 package zod.member.infra.adapter
 
 import org.springframework.stereotype.Repository
-import zod.member.domain.port.TokenCommandPort
+import zod.member.application.port.TokenCommandPort
 import zod.member.infra.entity.TokenEntity
 import zod.member.infra.jpa.TokenJpaRepository
 import java.time.LocalDateTime

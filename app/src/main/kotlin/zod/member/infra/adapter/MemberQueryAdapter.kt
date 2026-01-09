@@ -3,7 +3,7 @@ package zod.member.infra.adapter
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
 import zod.member.application.dto.MemberDto
-import zod.member.domain.port.MemberQueryPort
+import zod.member.application.port.MemberQueryPort
 import zod.member.infra.adapter.spec.MemberQuerySpec
 import zod.member.infra.entity.QMemberEntity
 import zod.member.infra.jpa.MemberJpaRepository

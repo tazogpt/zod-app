@@ -8,9 +8,9 @@ import zod.common.error.ErrorCode
 import zod.common.error.exception.ApiException
 import zod.common.security.JwtTokenProvider
 import zod.member.application.dto.MemberDto
-import zod.member.domain.port.MemberQueryPort
-import zod.member.domain.port.TokenCommandPort
-import zod.member.domain.port.TokenQueryPort
+import zod.member.application.port.MemberQueryPort
+import zod.member.application.port.TokenCommandPort
+import zod.member.application.port.TokenQueryPort
 import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
 import zod.member.domain.model.Member

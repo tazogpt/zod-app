@@ -1,7 +1,7 @@
 package zod.member.infra.adapter
 
 import org.springframework.stereotype.Repository
-import zod.member.domain.port.TokenQueryPort
+import zod.member.application.port.TokenQueryPort
 import zod.member.infra.jpa.TokenJpaRepository
 
 @Repository
