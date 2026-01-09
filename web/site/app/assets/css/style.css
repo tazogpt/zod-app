@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+@import './fonts.css';
+@import './transition.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary-50: var(--color-pink-50);
+    --color-primary-100: var(--color-pink-100);
+    --color-primary-200: var(--color-pink-200);
+    --color-primary-300: var(--color-pink-300);
+    --color-primary-400: var(--color-pink-400);
+    --color-primary-500: var(--color-pink-500);
+    --color-primary-600: var(--color-pink-600);
+    --color-primary-700: var(--color-pink-700);
+    --color-primary-800: var(--color-pink-800);
+    --color-primary-900: var(--color-pink-900);
+    --color-primary-950: var(--color-pink-950);
+    --color-surface-50: var(--color-zinc-50);
+    --color-surface-100: var(--color-zinc-100);
+    --color-surface-200: var(--color-zinc-200);
+    --color-surface-300: var(--color-zinc-300);
+    --color-surface-400: var(--color-zinc-400);
+    --color-surface-500: var(--color-zinc-500);
+    --color-surface-600: var(--color-zinc-600);
+    --color-surface-700: var(--color-zinc-700);
+    --color-surface-800: var(--color-zinc-800);
+    --color-surface-900: var(--color-zinc-900);
+    --color-surface-950: var(--color-zinc-950);
+
+    --font-base: 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --font-gmarket: 'Gmarket Sans', 'GmarketSans', sans-serif;
+    --font-pretendard: 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif';
+    --font-noto: 'Noto Sans KR', sans-serif;
+    --font-roboto: 'Roboto', sans-serif;
+
+    --breakpoint-xs: 30rem;
+    --breakpoint-3xl: 120rem;
+}
+
+@layer base {
+    input:focus,
+    textarea:focus,
+    select:focus,
+    button:focus {
+        @apply ring-0 outline-none;
+    }
+}
+
+@layer utilities {
+    .icon-gradient {
+        filter: saturate(0.7);
+        background: linear-gradient(180deg, var(--color-surface-400) 0%, var(--color-surface-600) 100%);
+    }
+    .group:hover .icon-gradient, .active .icon-gradient {
+        background: linear-gradient(180deg, var(--color-primary-400) 0%, var(--color-primary-800) 100%);
+        transform: scale(1.15);
+    }
+}
