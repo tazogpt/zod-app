@@ -7,9 +7,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import zod.common.error.ErrorCode
 import zod.common.error.exception.ApiException
 import zod.common.security.JwtTokenProvider
-import zod.member.domain.port.MemberQueryRepository
-import zod.member.domain.port.TokenCommandRepository
-import zod.member.domain.port.TokenQueryRepository
+import zod.member.application.dto.MemberDto
+import zod.member.domain.port.MemberQueryPort
+import zod.member.domain.port.TokenCommandPort
+import zod.member.domain.port.TokenQueryPort
 import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
 import zod.member.domain.model.Member
@@ -65,21 +66,21 @@ class AuthServiceTest {
     }
 
     private fun createService(
-        member: Member,
-        commandRepository: TokenCommandRepository,
-        queryRepository: TokenQueryRepository,
+        member: MemberDto.LoginUser,
+        commandRepository: TokenCommandPort,
+        queryRepository: TokenQueryPort,
     ): AuthService {
         return AuthService(
-            memberQueryRepository = InMemoryMemberRepository(member),
-            tokenCommandRepository = commandRepository,
-            tokenQueryRepository = queryRepository,
+            memberQueryPort = InMemoryMemberPort(member),
+            tokenCommandPort = commandRepository,
+            tokenQueryPort = queryRepository,
             passwordEncoder = passwordEncoder,
             jwtTokenProvider = tokenProvider,
         )
     }
 
-    private fun createMember(password: String): Member {
-        return Member(
+    private fun createMember(password: String): MemberDto.LoginUser {
+        return MemberDto.LoginUser(
             userid = "user-1",
             nickname = "nick",
             password = password,
@@ -89,15 +90,15 @@ class AuthServiceTest {
         )
     }
 
-    private class InMemoryMemberRepository(
-        private val member: Member,
-    ) : MemberQueryRepository {
-        override fun findByUserid(userid: String): Member? {
+    private class InMemoryMemberPort(
+        private val member: MemberDto.LoginUser,
+    ) : MemberQueryPort {
+        override fun findLoginUserByUserid(userid: String): MemberDto.LoginUser? {
             return if (userid == member.userid) member else null
         }
     }
 
-    private class InMemoryTokenStore : TokenCommandRepository, TokenQueryRepository {
+    private class InMemoryTokenStore : TokenCommandPort, TokenQueryPort {
         private val tokensByUser = mutableMapOf<String, String>()
 
         override fun save(userid: String, accessToken: String, refreshToken: String) {

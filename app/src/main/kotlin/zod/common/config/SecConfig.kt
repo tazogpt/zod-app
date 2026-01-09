@@ -40,6 +40,20 @@ class SecConfig {
                     "/swagger-ui.html",
                     "/v3/api-docs/**",
                 ).permitAll()
+                it.requestMatchers("/api/admin/**")
+                    .hasAnyRole("GOD", "SUPER", "ADMIN")
+                it.requestMatchers("/api/partner/**")
+                    .hasAnyRole(
+                        "GOD",
+                        "SUPER",
+                        "ADMIN",
+                        "AGENCY1",
+                        "AGENCY2",
+                        "AGENCY3",
+                        "AGENCY4",
+                        "AGENCY5",
+                        "AGENCY6"
+                    )
                 it.anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

@@ -1,5 +1,5 @@
 package zod.member.domain.port
 
-interface TokenQueryRepository {
+interface TokenQueryPort {
     fun findRefreshTokenByUserid(userid: String): String?
 }

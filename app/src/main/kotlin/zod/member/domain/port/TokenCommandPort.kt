@@ -1,5 +1,5 @@
 package zod.member.domain.port
 
-interface TokenCommandRepository {
+interface TokenCommandPort {
     fun save(userid: String, accessToken: String, refreshToken: String)
 }

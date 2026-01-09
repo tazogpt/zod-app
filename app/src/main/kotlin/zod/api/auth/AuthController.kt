@@ -5,11 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import zod.common.request.LoginRequest
-import zod.common.request.RefreshTokenRequest
 import zod.common.response.ApiResponse
-import zod.common.response.TokenResponse
 import zod.member.application.command.AuthService
+import zod.member.application.dto.AuthDto
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,9 +15,9 @@ class AuthController(
     private val authService: AuthService,
 ) {
     @PostMapping("/login")
-    fun login(@RequestBody request: LoginRequest): ResponseEntity<ApiResponse<TokenResponse>> {
+    fun login(@RequestBody request: AuthDto.LoginRequest): ResponseEntity<ApiResponse<AuthDto.TokenResponse>> {
         val result = authService.login(request.username, request.password)
-        return ApiResponse.success(TokenResponse(result.accessToken, result.refreshToken))
+        return ApiResponse.success(AuthDto.TokenResponse(result.accessToken, result.refreshToken))
             .toResponseEntity()
     }
 
@@ -30,9 +28,9 @@ class AuthController(
     }
 
     @PostMapping("/refresh")
-    fun refresh(@RequestBody request: RefreshTokenRequest): ResponseEntity<ApiResponse<TokenResponse>> {
+    fun refresh(@RequestBody request: AuthDto.RefreshRequest): ResponseEntity<ApiResponse<AuthDto.TokenResponse>> {
         val result = authService.refresh(request.refreshToken)
-        return ApiResponse.success(TokenResponse(result.accessToken, result.refreshToken))
+        return ApiResponse.success(AuthDto.TokenResponse(result.accessToken, result.refreshToken))
             .toResponseEntity()
     }
 }

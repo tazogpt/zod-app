@@ -2,6 +2,9 @@ package zod.common.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.querydsl.jpa.impl.JPAQueryFactory
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -16,7 +19,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @EnableTransactionManagement
 @EnableAsync
 @EnableScheduling
-class AppConfig {
+class AppConfig(
+    @PersistenceContext
+    private val entityManager: EntityManager,
+) {
 
     @Bean
     fun taskScheduler(): TaskScheduler {
@@ -36,14 +42,20 @@ class AppConfig {
     }
 
     @Bean("paymentExecutor")
-    fun paymentExecutor(): ThreadPoolTaskExecutor {
-        return ThreadPoolTaskExecutor().apply {
-            corePoolSize = 1
-            maxPoolSize = 1
-            initialize()
-        }
+    fun paymentExecutor(): ThreadPoolTaskExecutor = ThreadPoolTaskExecutor().apply {
+        corePoolSize = 1
+        maxPoolSize = 1
+        initialize()
     }
 
     @Bean
-    fun objectMapper(): ObjectMapper = jacksonObjectMapper()
+    fun objectMapper(): ObjectMapper {
+        return jacksonObjectMapper()
+    }
+
+    @Bean
+    fun queryFactory(): JPAQueryFactory {
+        return JPAQueryFactory(entityManager)
+    }
+
 }

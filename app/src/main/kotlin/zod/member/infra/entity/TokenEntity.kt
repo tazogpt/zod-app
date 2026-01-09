@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "token")
-data class TokenEntity(
+class TokenEntity(
     @Id
     @Column(length = 63, nullable = false)
     val userid: String,

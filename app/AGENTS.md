@@ -54,22 +54,49 @@ member
   - 비즈니스 규칙과 모델  
   - 기술 및 프레임워크 의존 금지
   - 도메인 이벤트는 domain 내부에서 생성/수집할 수 있습니다.
+  - domain 하바눈 enums, model, port 등등이 올수 있다. port 는 adapter 와 연결되는 interface 이다
 
 - application
   - 유스케이스 흐름 (오케스트레이션)
   - Command / Query 분리
   - 외부 의존은 interface로만 접근.
-  - interface 이름은 Port 대신 의미 기반 DDD 명칭을 사용합니다.
-    - 저장소: *Repository, *Store
-    - 조회: *Dao, *Reader
-    - 외부 연동: *Client, *Gateway, *Fetcher
-  - Request/Response DTO는 application 으로 고정하고, 혼용하지 않습니다.
+  - Request/Response DTO는 application 으로 고정하고, 혼용하지 않습니다. 파일 갯수가 많아지지 않도록 연관된 것들은 XxxDto 아래 하나로 묶어 준다.
+```
+class AuthDto {
+
+    data class LoginRequest(
+        val username: String,
+        val password: String,
+    )
+
+    data class RefreshRequest(
+        val refreshToken: String,
+    )
+}
+```
 
 - infra
   - 기술 구현(JPA, QueryDSL, WebClient, Scheduler 등)
   - application에 정의된 interface(Repository/Dao/Client 등)의 구현체만 위치합니다.
   - 구현체는 기술이 드러나는 이름을 사용합니다.
     - 예: JpaMemberRepository, QueryDslMemberDao, WebClientOddsClient, RedisTokenStore
+  - adapter 아래에 spec 패키지를 두고 adapter와 1:1 매칭을 한다. projections -> select, predicate -> where, orderBy 를 모아서 구성한다,
+```
+object MemberQuerySpec {
+
+    object Select {
+
+    }
+
+    object Where {
+
+    }
+
+    object OrderBy {
+        
+    }
+}
+```
 
 - api 
   - Controller 및 web entrypoint
@@ -89,12 +116,12 @@ member
 ### Command
 - 도메인 상태를 변경합니다.
 - application.command
-- 저장 및 갱신은 **CommandRepository** 를 사용합니다.
+- 저장 및 갱신은 **CommandPort** 를 사용합니다.
 
 ### Query
 - 도메인을 거치지 않아도 됩니다.
 - DTO 또는 ReadModel을 반환합니다.
-- **ReadRepository** 를 사용합니다.
+- **QueryPort** 를 사용합니다.
 
 ### 금지:
 - Query에서 Entity 반환

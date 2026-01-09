@@ -1,0 +1,18 @@
+package zod.member.application.dto
+
+import zod.common.annotation.NoArgs
+import zod.member.domain.enums.MemberRole
+import zod.member.domain.enums.MemberStatus
+
+class MemberDto {
+
+    @NoArgs
+    data class LoginUser(
+        val userid: String,
+        val nickname: String,
+        val password: String,
+        val role: MemberRole,
+        val status: MemberStatus,
+        val level: Int,
+    )
+}

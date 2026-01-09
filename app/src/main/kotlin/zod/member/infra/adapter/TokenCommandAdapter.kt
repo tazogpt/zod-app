@@ -1,7 +1,7 @@
 package zod.member.infra.adapter
 
 import org.springframework.stereotype.Repository
-import zod.member.domain.port.TokenCommandRepository
+import zod.member.domain.port.TokenCommandPort
 import zod.member.infra.entity.TokenEntity
 import zod.member.infra.jpa.TokenJpaRepository
 import java.time.LocalDateTime
@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Repository
 class TokenCommandAdapter(
     private val tokenJpaRepository: TokenJpaRepository,
-) : TokenCommandRepository {
+) : TokenCommandPort {
 
     override fun save(userid: String, accessToken: String, refreshToken: String) {
         tokenJpaRepository.save(
