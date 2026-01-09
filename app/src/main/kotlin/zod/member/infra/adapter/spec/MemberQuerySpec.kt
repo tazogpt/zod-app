@@ -2,15 +2,15 @@ package zod.member.infra.adapter.spec
 
 import com.querydsl.core.types.ConstructorExpression
 import com.querydsl.core.types.Projections
-import zod.member.application.dto.MemberDto
+import zod.member.application.query.model.AuthUser
 import zod.member.infra.entity.QMemberEntity
 
 object MemberQuerySpec {
 
     object Select {
-        fun loginUser(member: QMemberEntity): ConstructorExpression<MemberDto.LoginUser> {
+        fun authUser(member: QMemberEntity): ConstructorExpression<AuthUser> {
             return Projections.constructor(
-                MemberDto.LoginUser::class.java,
+                AuthUser::class.java,
                 member.userid,
                 member.nickname,
                 member.password,

@@ -1,9 +1,9 @@
 package zod.member.application.port
 
-import zod.member.application.dto.MemberDto
+import zod.member.application.query.model.AuthUser
 
 interface MemberQueryPort {
 
-    fun findLoginUserByUserid(userid: String): MemberDto.LoginUser?
+    fun findAuthUserByUserid(userid: String): AuthUser?
 
 }

@@ -39,6 +39,8 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
 
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
+
     runtimeOnly("com.microsoft.sqlserver:mssql-jdbc")
 
     implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1")

@@ -1,22 +1,23 @@
 package zod.member.application.command
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import zod.common.error.ErrorCode
 import zod.common.error.exception.ApiException
 import zod.common.security.JwtTokenProvider
-import zod.member.application.dto.MemberDto
 import zod.member.application.port.MemberQueryPort
 import zod.member.application.port.TokenCommandPort
 import zod.member.application.port.TokenQueryPort
+import zod.member.application.query.AuthQueryService
+import zod.member.application.query.model.AuthUser
 import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
-import zod.member.domain.model.Member
 import java.util.Base64
 
-class AuthServiceTest {
+class AuthCommandServiceTest {
     private val secretBase64 = Base64.getEncoder().encodeToString(ByteArray(64) { 3 })
     private val tokenProvider = JwtTokenProvider(
         secret = secretBase64,
@@ -27,7 +28,7 @@ class AuthServiceTest {
 
     @Test
     fun `로그인 성공 시 토큰을 반환하고 저장한다`() {
-        val member = createMember(requireNotNull(passwordEncoder.encode("pw1234")))
+        val member = createAuthUser(passwordEncoder.encode("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
 
@@ -40,7 +41,7 @@ class AuthServiceTest {
 
     @Test
     fun `잘못된 비밀번호는 UNAUTHORIZED 예외를 반환한다`() {
-        val member = createMember(requireNotNull(passwordEncoder.encode("pw1234")))
+        val member = createAuthUser(passwordEncoder.encode("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
 
@@ -52,8 +53,21 @@ class AuthServiceTest {
     }
 
     @Test
+    fun `비활성 사용자는 UNAUTHORIZED 예외를 반환한다`() {
+        val member = createAuthUser(passwordEncoder.encode("pw1234"), MemberStatus.INACTIVE)
+        val tokenStore = InMemoryTokenStore()
+        val authService = createService(member, tokenStore, tokenStore)
+
+        val ex = assertThrows(ApiException::class.java) {
+            authService.login("user-1", "pw1234")
+        }
+
+        assertEquals(ErrorCode.UNAUTHORIZED, ex.errorCode)
+    }
+
+    @Test
     fun `refresh 토큰 검증 후 새 토큰을 저장한다`() {
-        val member = createMember(requireNotNull(passwordEncoder.encode("pw1234")))
+        val member = createAuthUser(passwordEncoder.encode("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
         val refreshToken = tokenProvider.createRefreshToken("user-1")
@@ -65,35 +79,53 @@ class AuthServiceTest {
         assertEquals(storedRefresh, result.refreshToken)
     }
 
+    @Test
+    fun `logout 시 토큰을 삭제한다`() {
+        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val tokenStore = InMemoryTokenStore()
+        val authService = createService(member, tokenStore, tokenStore)
+        tokenStore.save("user-1", "access-token", "refresh-token")
+
+        authService.logout("user-1")
+
+        assertNull(tokenStore.findRefreshTokenByUserid("user-1"))
+    }
+
     private fun createService(
-        member: MemberDto.LoginUser,
-        commandRepository: TokenCommandPort,
-        queryRepository: TokenQueryPort,
-    ): AuthService {
-        return AuthService(
+        member: AuthUser,
+        commandPort: TokenCommandPort,
+        queryPort: TokenQueryPort,
+    ): AuthCommandService {
+        val authQueryService = AuthQueryService(
             memberQueryPort = InMemoryMemberPort(member),
-            tokenCommandPort = commandRepository,
-            tokenQueryPort = queryRepository,
+            tokenQueryPort = queryPort,
+        )
+        return AuthCommandService(
+            authQueryService = authQueryService,
+            tokenCommandPort = commandPort,
             passwordEncoder = passwordEncoder,
             jwtTokenProvider = tokenProvider,
         )
     }
 
-    private fun createMember(password: String): MemberDto.LoginUser {
-        return MemberDto.LoginUser(
+    private fun createAuthUser(
+        password: String,
+        status: MemberStatus = MemberStatus.ACTIVE,
+    ): AuthUser {
+        return AuthUser(
             userid = "user-1",
             nickname = "nick",
             password = password,
             role = MemberRole.USER,
-            status = MemberStatus.ACTIVE,
+            status = status,
             level = 1,
         )
     }
 
     private class InMemoryMemberPort(
-        private val member: MemberDto.LoginUser,
+        private val member: AuthUser,
     ) : MemberQueryPort {
-        override fun findLoginUserByUserid(userid: String): MemberDto.LoginUser? {
+        override fun findAuthUserByUserid(userid: String): AuthUser? {
             return if (userid == member.userid) member else null
         }
     }
@@ -103,6 +135,10 @@ class AuthServiceTest {
 
         override fun save(userid: String, accessToken: String, refreshToken: String) {
             tokensByUser[userid] = refreshToken
+        }
+
+        override fun deleteByUserid(userid: String) {
+            tokensByUser.remove(userid)
         }
 
         override fun findRefreshTokenByUserid(userid: String): String? {
