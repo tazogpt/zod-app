@@ -1,0 +1,38 @@
+@layer components {
+    .fade-enter-active,
+    .fade-leave-active {
+        @apply transition-opacity duration-150 delay-300;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+        @apply opacity-0;
+    }
+
+    .fade-enter-to,
+    .fade-leave-from {
+        @apply opacity-100;
+    }
+}
+
+@layer components {
+    .message-move {
+        @apply transition-transform;
+    }
+
+    .message-enter-active {
+        @apply transition-transform;
+    }
+
+    .message-leave-active {
+        @apply transition-transform duration-300;
+    }
+
+    .message-enter-from {
+        @apply translate-y-[300px] opacity-0 sm:-translate-y-full;
+    }
+
+    .message-leave-to {
+        @apply opacity-0;
+    }
+}
