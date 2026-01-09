@@ -16,7 +16,7 @@ class AuthController(
 ) {
     @PostMapping("/login")
     fun login(@RequestBody request: AuthDto.LoginRequest): ResponseEntity<ApiResponse<AuthDto.TokenResponse>> {
-        val result = authService.login(request.username, request.password)
+        val result = authService.login(request.userid, request.password)
         return ApiResponse.success(AuthDto.TokenResponse(result.accessToken, result.refreshToken))
             .toResponseEntity()
     }

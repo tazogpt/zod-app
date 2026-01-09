@@ -20,8 +20,8 @@ class AuthService(
     private val jwtTokenProvider: JwtTokenProvider,
 ) {
     @Transactional
-    fun login(username: String, password: String): AuthDto.ResultTokens {
-        val member = memberQueryPort.findLoginUserByUserid(username)
+    fun login(userid: String, password: String): AuthDto.ResultTokens {
+        val member = memberQueryPort.findLoginUserByUserid(userid)
             ?: throw ApiException(ErrorCode.UNAUTHORIZED)
 
         if (!passwordEncoder.matches(password, member.password)) {

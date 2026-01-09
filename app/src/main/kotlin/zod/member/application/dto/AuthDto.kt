@@ -3,7 +3,7 @@ package zod.member.application.dto
 class AuthDto {
 
     data class LoginRequest(
-        val username: String,
+        val userid: String,
         val password: String,
     )
 
