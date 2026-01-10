@@ -32,6 +32,16 @@ class AuthCommandService(
     }
 
     @Transactional
+    fun logout(refreshToken: String) {
+        val userid = extractUseridFromTokenAllowExpired(refreshToken)
+        val storedRefreshToken = authQueryService.findRefreshTokenByUserid(userid)
+
+        if (storedRefreshToken != null && storedRefreshToken == refreshToken) {
+            tokenCommandPort.deleteByUserid(userid)
+        }
+    }
+
+    @Transactional
     fun refresh(refreshToken: String): AuthDto.ResultTokens {
         val userid = extractUseridFromToken(refreshToken)
         val storedRefreshToken = getStoredRefreshToken(userid)
@@ -44,11 +54,6 @@ class AuthCommandService(
         validateMemberActive(member, ErrorCode.TOKEN_INVALID)
 
         return issueAndSaveTokens(member)
-    }
-
-    @Transactional
-    fun logout(userid: String) {
-        tokenCommandPort.deleteByUserid(userid)
     }
 
     private fun validateMemberActive(member: AuthUser, errorCode: ErrorCode) {
@@ -65,6 +70,11 @@ class AuthCommandService(
 
     private fun extractUseridFromToken(refreshToken: String): String {
         val claims = jwtTokenProvider.parseClaims(refreshToken)
+        return claims.subject
+    }
+
+    private fun extractUseridFromTokenAllowExpired(refreshToken: String): String {
+        val claims = jwtTokenProvider.parseClaimsAllowExpired(refreshToken)
         return claims.subject
     }
 

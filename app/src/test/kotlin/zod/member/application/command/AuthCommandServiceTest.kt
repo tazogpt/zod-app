@@ -80,15 +80,30 @@ class AuthCommandServiceTest {
     }
 
     @Test
-    fun `logout 시 토큰을 삭제한다`() {
+    fun `logout 시 저장된 토큰과 일치하면 삭제한다`() {
         val member = createAuthUser(passwordEncoder.encode("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
-        tokenStore.save("user-1", "access-token", "refresh-token")
+        val refreshToken = tokenProvider.createRefreshToken("user-1")
+        tokenStore.save("user-1", "access-token", refreshToken)
 
-        authService.logout("user-1")
+        authService.logout(refreshToken)
 
         assertNull(tokenStore.findRefreshTokenByUserid("user-1"))
+    }
+
+    @Test
+    fun `logout 시 저장된 토큰과 불일치하면 삭제하지 않는다`() {
+        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val tokenStore = InMemoryTokenStore()
+        val authService = createService(member, tokenStore, tokenStore)
+        val storedRefreshToken = tokenProvider.createRefreshToken("user-1")
+        val differentRefreshToken = tokenProvider.createRefreshToken("user-1")
+        tokenStore.save("user-1", "access-token", storedRefreshToken)
+
+        authService.logout(differentRefreshToken)
+
+        assertEquals(storedRefreshToken, tokenStore.findRefreshTokenByUserid("user-1"))
     }
 
     private fun createService(

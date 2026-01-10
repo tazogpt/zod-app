@@ -1,7 +1,6 @@
 package zod.api.auth
 
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,8 +22,8 @@ class AuthController(
     }
 
     @PostMapping("/logout")
-    fun logout(authentication: Authentication): ResponseEntity<ApiResponse<Nothing>> {
-        authCommandService.logout(authentication.name)
+    fun logout(@RequestBody request: AuthDto.LogoutRequest): ResponseEntity<ApiResponse<Nothing>> {
+        authCommandService.logout(request.refreshToken)
         return ApiResponse.success().toResponseEntity()
     }
 

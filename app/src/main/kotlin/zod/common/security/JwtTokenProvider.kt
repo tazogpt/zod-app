@@ -64,6 +64,23 @@ class JwtTokenProvider(
         }
     }
 
+    fun parseClaimsAllowExpired(token: String): Claims {
+        try {
+            return Jwts
+                .parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+        } catch (ex: ExpiredJwtException) {
+            return ex.claims
+        } catch (ex: JwtException) {
+            throw ApiException(ErrorCode.TOKEN_INVALID, ex)
+        } catch (ex: IllegalArgumentException) {
+            throw ApiException(ErrorCode.TOKEN_INVALID, ex)
+        }
+    }
+
     private fun createAccessToken(
         userid: String,
         nickname: String,

@@ -1,6 +1,8 @@
 package zod.member.infra.adapter
 
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import zod.member.application.port.TokenCommandPort
 import zod.member.infra.cache.TokenCache
 import zod.member.infra.entity.TokenEntity
@@ -22,11 +24,23 @@ class TokenCommandAdapter(
                 updatedAt = LocalDateTime.now(),
             ),
         )
-        tokenCache.put(userid, refreshToken)
+        executeAfterCommit { tokenCache.put(userid, refreshToken) }
     }
 
     override fun deleteByUserid(userid: String) {
         tokenJpaRepository.deleteById(userid)
-        tokenCache.evict(userid)
+        executeAfterCommit { tokenCache.evict(userid) }
+    }
+
+    private fun executeAfterCommit(action: () -> Unit) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+                override fun afterCommit() {
+                    action()
+                }
+            })
+        } else {
+            action()
+        }
     }
 }

@@ -7,6 +7,10 @@ class AuthDto {
         val password: String,
     )
 
+    data class LogoutRequest(
+        val refreshToken: String,
+    )
+
     data class RefreshRequest(
         val refreshToken: String,
     )
