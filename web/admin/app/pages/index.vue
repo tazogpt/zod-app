@@ -6,34 +6,66 @@ definePageMeta({
 const userid = ref('')
 const password = ref('')
 const isSubmitting = ref(false)
+const showModal = ref(false)
+const modalMessage = ref('')
+const router = useRouter()
+const route = useRoute()
+const userStore = useUserStore()
+const { $api } = useNuxtApp()
+const showToast = ref(false)
+const toastMessage = ref('')
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
 const toggleColorMode = () => {
     colorMode.preference = isDark.value ? 'light' : 'dark'
 }
 
+const openModal = (message: string) => {
+    modalMessage.value = message
+    showModal.value = true
+}
+
 const submitLogin = async () => {
     if (!userid.value || !password.value) {
-        alert('아이디와 비밀번호를 입력해 주세요.')
+        openModal('아이디와 비밀번호를 입력해 주세요.')
         return
     }
 
     isSubmitting.value = true
     try {
-        await $fetch('/api/auth/login', {
+        const response = await $api<{ code: string; message: string; data?: { accessToken: string; refreshToken: string } }>(
+            '/api/auth/login',
+            {
             method: 'POST',
             body: {
                 userid: userid.value,
-                password: password.value
+                password: password.value,
+                channel: 'ADMIN'
             }
-        })
-        alert('로그인에 성공했습니다.')
+            }
+        )
+        if (response.code !== 'SUCCESS' || !response.data) {
+            openModal(response.message || '로그인에 실패했습니다. 다시 시도해 주세요.')
+            return
+        }
+        userStore.setSession(response.data)
+        await router.push('/main')
     } catch (error) {
-        alert('로그인에 실패했습니다. 다시 시도해 주세요.')
+        openModal('로그인에 실패했습니다. 다시 시도해 주세요.')
     } finally {
         isSubmitting.value = false
     }
 }
+
+onMounted(() => {
+    if (route.query.logout === '1') {
+        toastMessage.value = '로그아웃되었습니다.'
+        showToast.value = true
+        setTimeout(() => {
+            showToast.value = false
+        }, 2200)
+    }
+})
 </script>
 
 <template>
@@ -101,5 +133,39 @@ const submitLogin = async () => {
                 </form>
             </div>
         </section>
+        <teleport to="body">
+            <div
+                v-if="showModal"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/60 px-4 py-6 backdrop-blur"
+                role="dialog"
+                aria-modal="true"
+            >
+                <div
+                    class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl shadow-surface-900/20 dark:bg-surface-900"
+                >
+                    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-50">로그인 안내</h2>
+                    <p class="mt-2 text-sm text-surface-600 dark:text-surface-300">
+                        {{ modalMessage }}
+                    </p>
+                    <button
+                        type="button"
+                        class="mt-5 w-full rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 dark:bg-primary-500 dark:text-surface-950 dark:hover:bg-primary-400"
+                        @click="showModal = false"
+                    >
+                        확인
+                    </button>
+                </div>
+            </div>
+        </teleport>
+        <teleport to="body">
+            <div
+                v-if="showToast"
+                class="fixed right-4 top-4 z-50 rounded-full bg-surface-900/90 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-surface-900/30 backdrop-blur"
+                role="status"
+                aria-live="polite"
+            >
+                {{ toastMessage }}
+            </div>
+        </teleport>
     </main>
 </template>
