@@ -28,7 +28,7 @@ class AuthCommandServiceTest {
 
     @Test
     fun `로그인 성공 시 토큰을 반환하고 저장한다`() {
-        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val member = createAuthUser(encodePassword("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
 
@@ -41,7 +41,7 @@ class AuthCommandServiceTest {
 
     @Test
     fun `잘못된 비밀번호는 UNAUTHORIZED 예외를 반환한다`() {
-        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val member = createAuthUser(encodePassword("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
 
@@ -54,7 +54,7 @@ class AuthCommandServiceTest {
 
     @Test
     fun `비활성 사용자는 UNAUTHORIZED 예외를 반환한다`() {
-        val member = createAuthUser(passwordEncoder.encode("pw1234"), MemberStatus.INACTIVE)
+        val member = createAuthUser(encodePassword("pw1234"), MemberStatus.BLOCK)
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
 
@@ -67,7 +67,7 @@ class AuthCommandServiceTest {
 
     @Test
     fun `refresh 토큰 검증 후 새 토큰을 저장한다`() {
-        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val member = createAuthUser(encodePassword("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
         val refreshToken = tokenProvider.createRefreshToken("user-1")
@@ -81,7 +81,7 @@ class AuthCommandServiceTest {
 
     @Test
     fun `logout 시 저장된 토큰과 일치하면 삭제한다`() {
-        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val member = createAuthUser(encodePassword("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
         val refreshToken = tokenProvider.createRefreshToken("user-1")
@@ -94,11 +94,11 @@ class AuthCommandServiceTest {
 
     @Test
     fun `logout 시 저장된 토큰과 불일치하면 삭제하지 않는다`() {
-        val member = createAuthUser(passwordEncoder.encode("pw1234"))
+        val member = createAuthUser(encodePassword("pw1234"))
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
         val storedRefreshToken = tokenProvider.createRefreshToken("user-1")
-        val differentRefreshToken = tokenProvider.createRefreshToken("user-1")
+        val differentRefreshToken = tokenProvider.createRefreshToken("user-2")
         tokenStore.save("user-1", "access-token", storedRefreshToken)
 
         authService.logout(differentRefreshToken)
@@ -135,6 +135,10 @@ class AuthCommandServiceTest {
             status = status,
             level = 1,
         )
+    }
+
+    private fun encodePassword(raw: String): String {
+        return requireNotNull(passwordEncoder.encode(raw))
     }
 
     private class InMemoryMemberPort(

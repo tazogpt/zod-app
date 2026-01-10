@@ -54,6 +54,37 @@ class JwtTokenProviderTest {
     }
 
     @Test
+    fun `만료된 토큰은 allowExpired에서 claims를 반환한다`() {
+        val expiredToken = createToken(
+            secret = secretBase64,
+            subject = "user-1",
+            issuedAt = Instant.now().minusSeconds(120),
+            expiresAt = Instant.now().minusSeconds(60),
+        )
+
+        val claims = provider.parseClaimsAllowExpired(expiredToken)
+
+        assertEquals("user-1", claims.subject)
+    }
+
+    @Test
+    fun `잘못된 토큰은 allowExpired에서도 TOKEN_INVALID 예외를 반환한다`() {
+        val otherSecret = Base64.getEncoder().encodeToString(ByteArray(64) { 2 })
+        val invalidToken = createToken(
+            secret = otherSecret,
+            subject = "user-1",
+            issuedAt = Instant.now().minusSeconds(60),
+            expiresAt = Instant.now().plusSeconds(600),
+        )
+
+        val ex = assertThrows(ApiException::class.java) {
+            provider.parseClaimsAllowExpired(invalidToken)
+        }
+
+        assertEquals(ErrorCode.TOKEN_INVALID, ex.errorCode)
+    }
+
+    @Test
     fun `잘못된 토큰은 TOKEN_INVALID 예외를 반환한다`() {
         val otherSecret = Base64.getEncoder().encodeToString(ByteArray(64) { 2 })
         val invalidToken = createToken(
