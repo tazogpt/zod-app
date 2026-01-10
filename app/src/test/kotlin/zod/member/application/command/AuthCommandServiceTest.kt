@@ -161,6 +161,14 @@ class AuthCommandServiceTest {
         override fun findAuthUserByUserid(userid: String): AuthUser? {
             return if (userid == member.userid) member else null
         }
+
+        override fun existsByUserid(userid: String): Boolean {
+            return member.userid == userid
+        }
+
+        override fun existsByNickname(nickname: String): Boolean {
+            return member.nickname == nickname
+        }
     }
 
     private class InMemoryTokenStore : TokenCommandPort, TokenQueryPort {

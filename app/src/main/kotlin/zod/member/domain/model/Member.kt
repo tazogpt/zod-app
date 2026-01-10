@@ -2,6 +2,7 @@ package zod.member.domain.model
 
 import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
+import java.time.LocalDateTime
 
 data class Member(
     val userid: String,
@@ -10,4 +11,5 @@ data class Member(
     val role: MemberRole,
     val status: MemberStatus,
     val level: Int,
+    val signupAt: LocalDateTime?,
 )

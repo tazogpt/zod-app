@@ -10,6 +10,7 @@ import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
 import zod.member.infra.entity.MemberEntity
 import zod.member.infra.jpa.MemberJpaRepository
+import java.time.LocalDateTime
 
 @Component
 class MemberSeedListener(
@@ -42,6 +43,7 @@ class MemberSeedListener(
                     role = seed.role,
                     status = MemberStatus.ACTIVE,
                     level = seed.level,
+                    signupAt = LocalDateTime.now(),
                 )
             )
         }

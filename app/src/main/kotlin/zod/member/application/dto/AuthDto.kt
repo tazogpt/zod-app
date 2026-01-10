@@ -8,6 +8,12 @@ class AuthDto {
         val channel: String = "",
     )
 
+    data class SignupRequest(
+        val userid: String,
+        val nickname: String,
+        val password: String,
+    )
+
     data class LogoutRequest(
         val userid: String,
         val refreshToken: String,

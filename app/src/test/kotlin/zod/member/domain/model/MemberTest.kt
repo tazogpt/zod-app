@@ -4,11 +4,13 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
+import java.time.LocalDateTime
 
 class MemberTest {
 
     @Test
     fun `Member는 입력 값을 그대로 가진다`() {
+        val signupAt = LocalDateTime.now()
         val member = Member(
             userid = "user-1",
             nickname = "nick",
@@ -16,6 +18,7 @@ class MemberTest {
             role = MemberRole.USER,
             status = MemberStatus.ACTIVE,
             level = 3,
+            signupAt = signupAt,
         )
 
         assertEquals("user-1", member.userid)
@@ -24,5 +27,6 @@ class MemberTest {
         assertEquals(MemberRole.USER, member.role)
         assertEquals(MemberStatus.ACTIVE, member.status)
         assertEquals(3, member.level)
+        assertEquals(signupAt, member.signupAt)
     }
 }

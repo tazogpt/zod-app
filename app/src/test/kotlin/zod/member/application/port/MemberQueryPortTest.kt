@@ -15,4 +15,17 @@ class MemberQueryPortTest {
         assertNotNull(method)
         assertEquals(AuthUser::class.java, method?.returnType)
     }
+
+    @Test
+    fun `MemberQueryPort는 중복 조회 메서드를 가진다`() {
+        val methods = MemberQueryPort::class.java.methods
+
+        val useridMethod = methods.firstOrNull { it.name == "existsByUserid" }
+        val nicknameMethod = methods.firstOrNull { it.name == "existsByNickname" }
+
+        assertNotNull(useridMethod)
+        assertNotNull(nicknameMethod)
+        assertEquals(Boolean::class.javaPrimitiveType, useridMethod?.returnType)
+        assertEquals(Boolean::class.javaPrimitiveType, nicknameMethod?.returnType)
+    }
 }

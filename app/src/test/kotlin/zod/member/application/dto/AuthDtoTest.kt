@@ -15,6 +15,15 @@ class AuthDtoTest {
     }
 
     @Test
+    fun `회원가입 요청 DTO는 값을 보존한다`() {
+        val request = AuthDto.SignupRequest("user-1", "nick", "pw1234")
+
+        assertEquals("user-1", request.userid)
+        assertEquals("nick", request.nickname)
+        assertEquals("pw1234", request.password)
+    }
+
+    @Test
     fun `리프레시 요청 DTO는 토큰 값을 보존한다`() {
         val request = AuthDto.RefreshRequest("refresh")
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*
 import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
 import zod.member.domain.model.Member
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "member")
@@ -32,6 +33,9 @@ class MemberEntity(
 
     @Column(nullable = false)
     val level: Int,
+
+    @Column
+    val signupAt: LocalDateTime?,
 ) {
 
     fun toDomain(): Member = Member(
@@ -41,5 +45,6 @@ class MemberEntity(
         role = role,
         status = status,
         level = level,
+        signupAt = signupAt,
     )
 }

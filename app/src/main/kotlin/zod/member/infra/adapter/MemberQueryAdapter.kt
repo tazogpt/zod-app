@@ -23,4 +23,22 @@ class MemberQueryAdapter(
             .where(member.userid.eq(userid))
             .fetchFirst()
     }
+
+    override fun existsByUserid(userid: String): Boolean {
+        val member = QMemberEntity.memberEntity
+        return queryFactory
+            .selectOne()
+            .from(member)
+            .where(member.userid.eq(userid))
+            .fetchFirst() != null
+    }
+
+    override fun existsByNickname(nickname: String): Boolean {
+        val member = QMemberEntity.memberEntity
+        return queryFactory
+            .selectOne()
+            .from(member)
+            .where(member.nickname.eq(nickname))
+            .fetchFirst() != null
+    }
 }

@@ -76,6 +76,14 @@ class AuthQueryServiceTest {
         override fun findAuthUserByUserid(userid: String): AuthUser? {
             return if (member != null && userid == member.userid) member else null
         }
+
+        override fun existsByUserid(userid: String): Boolean {
+            return member != null && userid == member.userid
+        }
+
+        override fun existsByNickname(nickname: String): Boolean {
+            return member != null && nickname == member.nickname
+        }
     }
 
     private class InMemoryTokenQueryPort(
