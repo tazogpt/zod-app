@@ -10,6 +10,7 @@ import zod.member.application.dto.AuthDto
 import zod.member.application.port.TokenCommandPort
 import zod.member.application.query.AuthQueryService
 import zod.member.application.query.model.AuthUser
+import zod.member.domain.enums.MemberRole
 import zod.member.domain.enums.MemberStatus
 import java.util.Date
 
@@ -22,7 +23,7 @@ class AuthCommandService(
 ) {
 
     @Transactional
-    fun login(userid: String, password: String): AuthDto.ResultTokens {
+    fun login(userid: String, password: String, group: MemberRole.Group): AuthDto.ResultTokens {
         val member = authQueryService.findLoginUserByUserid(userid)
             ?: throw ApiException(ErrorCode.UNAUTHORIZED)
 
@@ -31,6 +32,10 @@ class AuthCommandService(
         }
 
         if (!passwordEncoder.matches(password, member.password)) {
+            throw ApiException(ErrorCode.UNAUTHORIZED)
+        }
+
+        if (member.role.group != group) {
             throw ApiException(ErrorCode.UNAUTHORIZED)
         }
 

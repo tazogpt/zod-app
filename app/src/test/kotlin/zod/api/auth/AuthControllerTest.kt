@@ -8,6 +8,7 @@ import org.mockito.Mockito.times
 import org.springframework.http.HttpStatus
 import zod.member.application.command.AuthCommandService
 import zod.member.application.dto.AuthDto
+import zod.member.domain.enums.MemberRole
 
 class AuthControllerTest {
 
@@ -16,7 +17,7 @@ class AuthControllerTest {
         val service = Mockito.mock(AuthCommandService::class.java)
         val controller = AuthController(service)
         val result = AuthDto.ResultTokens("access-token", "refresh-token")
-        Mockito.`when`(service.login("user-1", "pw1234")).thenReturn(result)
+        Mockito.`when`(service.login("user-1", "pw1234", MemberRole.Group.USER)).thenReturn(result)
 
         val response = controller.login(AuthDto.LoginRequest("user-1", "pw1234"))
 
@@ -26,7 +27,7 @@ class AuthControllerTest {
         assertEquals("SUCCESS", body?.code)
         assertEquals("access-token", body?.data?.accessToken)
         assertEquals("refresh-token", body?.data?.refreshToken)
-        Mockito.verify(service, times(1)).login("user-1", "pw1234")
+        Mockito.verify(service, times(1)).login("user-1", "pw1234", MemberRole.Group.USER)
     }
 
     @Test

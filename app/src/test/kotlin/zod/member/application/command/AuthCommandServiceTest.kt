@@ -32,7 +32,7 @@ class AuthCommandServiceTest {
         val tokenStore = InMemoryTokenStore()
         val authService = createService(member, tokenStore, tokenStore)
 
-        val result = authService.login("user-1", "pw1234")
+        val result = authService.login("user-1", "pw1234", MemberRole.Group.USER)
 
         val storedRefresh = requireNotNull(tokenStore.findRefreshTokenByUserid("user-1"))
         assertEquals(result.refreshToken, storedRefresh)
@@ -46,7 +46,7 @@ class AuthCommandServiceTest {
         val authService = createService(member, tokenStore, tokenStore)
 
         val ex = assertThrows(ApiException::class.java) {
-            authService.login("user-1", "wrong")
+            authService.login("user-1", "wrong", MemberRole.Group.USER)
         }
 
         assertEquals(ErrorCode.UNAUTHORIZED, ex.errorCode)
@@ -59,7 +59,7 @@ class AuthCommandServiceTest {
         val authService = createService(member, tokenStore, tokenStore)
 
         val ex = assertThrows(ApiException::class.java) {
-            authService.login("user-1", "pw1234")
+            authService.login("user-1", "pw1234", MemberRole.Group.USER)
         }
 
         assertEquals(ErrorCode.UNAUTHORIZED, ex.errorCode)
@@ -106,6 +106,19 @@ class AuthCommandServiceTest {
         assertEquals(storedRefreshToken, tokenStore.findRefreshTokenByUserid("user-1"))
     }
 
+    @Test
+    fun `롤 그룹이 일치하지 않으면 UNAUTHORIZED 예외를 반환한다`() {
+        val member = createAuthUser(encodePassword("pw1234"), role = MemberRole.ADMIN)
+        val tokenStore = InMemoryTokenStore()
+        val authService = createService(member, tokenStore, tokenStore)
+
+        val ex = assertThrows(ApiException::class.java) {
+            authService.login("user-1", "pw1234", MemberRole.Group.USER)
+        }
+
+        assertEquals(ErrorCode.UNAUTHORIZED, ex.errorCode)
+    }
+
     private fun createService(
         member: AuthUser,
         commandPort: TokenCommandPort,
@@ -126,12 +139,13 @@ class AuthCommandServiceTest {
     private fun createAuthUser(
         password: String,
         status: MemberStatus = MemberStatus.ACTIVE,
+        role: MemberRole = MemberRole.USER,
     ): AuthUser {
         return AuthUser(
             userid = "user-1",
             nickname = "nick",
             password = password,
-            role = MemberRole.USER,
+            role = role,
             status = status,
             level = 1,
         )

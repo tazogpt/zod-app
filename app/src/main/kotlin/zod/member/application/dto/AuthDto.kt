@@ -5,6 +5,7 @@ class AuthDto {
     data class LoginRequest(
         val userid: String,
         val password: String,
+        val channel: String = "",
     )
 
     data class LogoutRequest(

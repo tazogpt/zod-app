@@ -11,6 +11,7 @@ class AuthDtoTest {
 
         assertEquals("user-1", request.userid)
         assertEquals("pw1234", request.password)
+        assertEquals("", request.channel)
     }
 
     @Test
