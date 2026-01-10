@@ -11,6 +11,7 @@ import zod.member.application.port.TokenCommandPort
 import zod.member.application.query.AuthQueryService
 import zod.member.application.query.model.AuthUser
 import zod.member.domain.enums.MemberStatus
+import java.util.Date
 
 @Service
 class AuthCommandService(
@@ -25,15 +26,19 @@ class AuthCommandService(
         val member = authQueryService.findLoginUserByUserid(userid)
             ?: throw ApiException(ErrorCode.UNAUTHORIZED)
 
-        validateMemberActive(member, ErrorCode.UNAUTHORIZED)
-        validatePassword(password, member.password)
+        if (member.status != MemberStatus.ACTIVE) {
+            throw ApiException(ErrorCode.UNAUTHORIZED)
+        }
+
+        if (!passwordEncoder.matches(password, member.password)) {
+            throw ApiException(ErrorCode.UNAUTHORIZED)
+        }
 
         return issueAndSaveTokens(member)
     }
 
     @Transactional
-    fun logout(refreshToken: String) {
-        val userid = extractUseridFromTokenAllowExpired(refreshToken)
+    fun logout(userid: String, refreshToken: String) {
         val storedRefreshToken = authQueryService.findRefreshTokenByUserid(userid)
 
         if (storedRefreshToken != null && storedRefreshToken == refreshToken) {
@@ -43,50 +48,27 @@ class AuthCommandService(
 
     @Transactional
     fun refresh(refreshToken: String): AuthDto.ResultTokens {
-        val userid = extractUseridFromToken(refreshToken)
-        val storedRefreshToken = getStoredRefreshToken(userid)
+        val claims = jwtTokenProvider.parseRefreshClaimsAllowExpired(refreshToken)
+        if (claims.expiration.before(Date())) {
+            throw ApiException(ErrorCode.TOKEN_EXPIRED)
+        }
+        val userid = claims.subject
 
-        validateRefreshTokenMatch(storedRefreshToken, refreshToken)
+        val storedRefreshToken = authQueryService.findRefreshTokenByUserid(userid)
+            ?: throw ApiException(ErrorCode.TOKEN_INVALID)
+
+        if (storedRefreshToken != refreshToken) {
+            throw ApiException(ErrorCode.TOKEN_INVALID)
+        }
 
         val member = authQueryService.findLoginUserByUserid(userid)
             ?: throw ApiException(ErrorCode.TOKEN_INVALID)
 
-        validateMemberActive(member, ErrorCode.TOKEN_INVALID)
-
-        return issueAndSaveTokens(member)
-    }
-
-    private fun validateMemberActive(member: AuthUser, errorCode: ErrorCode) {
         if (member.status != MemberStatus.ACTIVE) {
-            throw ApiException(errorCode)
-        }
-    }
-
-    private fun validatePassword(rawPassword: String, encodedPassword: String) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw ApiException(ErrorCode.UNAUTHORIZED)
-        }
-    }
-
-    private fun extractUseridFromToken(refreshToken: String): String {
-        val claims = jwtTokenProvider.parseClaims(refreshToken)
-        return claims.subject
-    }
-
-    private fun extractUseridFromTokenAllowExpired(refreshToken: String): String {
-        val claims = jwtTokenProvider.parseClaimsAllowExpired(refreshToken)
-        return claims.subject
-    }
-
-    private fun getStoredRefreshToken(userid: String): String {
-        return authQueryService.findRefreshTokenByUserid(userid)
-            ?: throw ApiException(ErrorCode.TOKEN_INVALID)
-    }
-
-    private fun validateRefreshTokenMatch(stored: String, requested: String) {
-        if (stored != requested) {
             throw ApiException(ErrorCode.TOKEN_INVALID)
         }
+
+        return issueAndSaveTokens(member)
     }
 
     private fun issueAndSaveTokens(member: AuthUser): AuthDto.ResultTokens {

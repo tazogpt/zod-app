@@ -23,7 +23,7 @@ class AuthController(
 
     @PostMapping("/logout")
     fun logout(@RequestBody request: AuthDto.LogoutRequest): ResponseEntity<ApiResponse<Nothing>> {
-        authCommandService.logout(request.refreshToken)
+        authCommandService.logout(request.userid, request.refreshToken)
         return ApiResponse.success().toResponseEntity()
     }
 

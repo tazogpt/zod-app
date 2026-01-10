@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
+import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class AppConfigTest {
 
@@ -18,7 +19,9 @@ class AppConfigTest {
         val executor = config.taskExecutor() as ThreadPoolTaskExecutor
         val paymentExecutor = config.paymentExecutor()
 
-        assertEquals(30, scheduler.poolSize)
+        val scheduledExecutor = requireNotNull(scheduler.scheduledExecutor)
+        val threadPoolExecutor = requireNotNull(scheduledExecutor as? ScheduledThreadPoolExecutor)
+        assertEquals(30, threadPoolExecutor.corePoolSize)
         assertEquals(30, executor.corePoolSize)
         assertEquals(1, paymentExecutor.corePoolSize)
         assertEquals(1, paymentExecutor.maxPoolSize)

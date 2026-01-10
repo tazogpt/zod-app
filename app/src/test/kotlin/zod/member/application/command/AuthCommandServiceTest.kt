@@ -36,7 +36,7 @@ class AuthCommandServiceTest {
 
         val storedRefresh = requireNotNull(tokenStore.findRefreshTokenByUserid("user-1"))
         assertEquals(result.refreshToken, storedRefresh)
-        assertEquals("user-1", tokenProvider.parseClaims(result.accessToken).subject)
+        assertEquals("user-1", tokenProvider.parseAccessClaims(result.accessToken).subject)
     }
 
     @Test
@@ -87,7 +87,7 @@ class AuthCommandServiceTest {
         val refreshToken = tokenProvider.createRefreshToken("user-1")
         tokenStore.save("user-1", "access-token", refreshToken)
 
-        authService.logout(refreshToken)
+        authService.logout("user-1", refreshToken)
 
         assertNull(tokenStore.findRefreshTokenByUserid("user-1"))
     }
@@ -101,7 +101,7 @@ class AuthCommandServiceTest {
         val differentRefreshToken = tokenProvider.createRefreshToken("user-2")
         tokenStore.save("user-1", "access-token", storedRefreshToken)
 
-        authService.logout(differentRefreshToken)
+        authService.logout("user-1", differentRefreshToken)
 
         assertEquals(storedRefreshToken, tokenStore.findRefreshTokenByUserid("user-1"))
     }

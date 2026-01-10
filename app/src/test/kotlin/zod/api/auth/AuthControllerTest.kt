@@ -52,12 +52,12 @@ class AuthControllerTest {
         val service = Mockito.mock(AuthCommandService::class.java)
         val controller = AuthController(service)
 
-        val response = controller.logout(AuthDto.LogoutRequest("refresh-token"))
+        val response = controller.logout(AuthDto.LogoutRequest("user-1", "refresh-token"))
 
         assertEquals(HttpStatus.OK, response.statusCode)
         val body = response.body
         assertNotNull(body)
         assertEquals("SUCCESS", body?.code)
-        Mockito.verify(service, times(1)).logout("refresh-token")
+        Mockito.verify(service, times(1)).logout("user-1", "refresh-token")
     }
 }

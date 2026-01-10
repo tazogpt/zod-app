@@ -13,7 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import zod.common.error.ErrorCode
 import zod.common.error.exception.ApiException
-import java.util.Date
+import java.util.*
 
 @Component
 class JwtTokenProvider(
@@ -31,25 +31,42 @@ class JwtTokenProvider(
         role: String,
         level: Int,
     ): String {
-        return createAccessToken(userid, nickname, role, level, accessSeconds)
+        val now = Date()
+        val expiry = Date(now.time + accessSeconds * 1000)
+        return Jwts.builder()
+            .subject(userid)
+            .claim("nickname", nickname)
+            .claim("role", role)
+            .claim("level", level)
+            .issuedAt(now)
+            .expiration(expiry)
+            .signWith(secretKey, Jwts.SIG.HS512)
+            .compact()
     }
 
     fun createRefreshToken(
         userid: String,
     ): String {
-        return createRefreshToken(userid, refreshSeconds)
+        val now = Date()
+        val expiry = Date(now.time + refreshSeconds * 1000)
+        return Jwts.builder()
+            .subject(userid)
+            .issuedAt(now)
+            .expiration(expiry)
+            .signWith(secretKey, Jwts.SIG.HS512)
+            .compact()
     }
 
     fun getAuthentication(token: String): Authentication {
-        val claims = parseClaims(token)
+        val claims = parseAccessClaims(token)
         val role = claims["role"]?.toString() ?: "USER"
         val authority = SimpleGrantedAuthority(normalizeRole(role))
         return UsernamePasswordAuthenticationToken(claims.subject, null, listOf(authority))
     }
 
-    fun parseClaims(token: String): Claims {
-        try {
-            return Jwts
+    fun parseAccessClaims(token: String): Claims {
+        return try {
+            Jwts
                 .parser()
                 .verifyWith(secretKey)
                 .build()
@@ -64,55 +81,21 @@ class JwtTokenProvider(
         }
     }
 
-    fun parseClaimsAllowExpired(token: String): Claims {
-        try {
-            return Jwts
+    fun parseRefreshClaimsAllowExpired(token: String): Claims {
+        return try {
+            Jwts
                 .parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .payload
         } catch (ex: ExpiredJwtException) {
-            return ex.claims
+            ex.claims
         } catch (ex: JwtException) {
             throw ApiException(ErrorCode.TOKEN_INVALID, ex)
         } catch (ex: IllegalArgumentException) {
             throw ApiException(ErrorCode.TOKEN_INVALID, ex)
         }
-    }
-
-    private fun createAccessToken(
-        userid: String,
-        nickname: String,
-        role: String,
-        level: Int,
-        validitySeconds: Long,
-    ): String {
-        val now = Date()
-        val expiry = Date(now.time + validitySeconds * 1000)
-        return Jwts.builder()
-            .subject(userid)
-            .claim("nickname", nickname)
-            .claim("role", role)
-            .claim("level", level)
-            .issuedAt(now)
-            .expiration(expiry)
-            .signWith(secretKey, Jwts.SIG.HS512)
-            .compact()
-    }
-
-    private fun createRefreshToken(
-        userid: String,
-        validitySeconds: Long,
-    ): String {
-        val now = Date()
-        val expiry = Date(now.time + validitySeconds * 1000)
-        return Jwts.builder()
-            .subject(userid)
-            .issuedAt(now)
-            .expiration(expiry)
-            .signWith(secretKey, Jwts.SIG.HS512)
-            .compact()
     }
 
     private fun normalizeRole(role: String): String {

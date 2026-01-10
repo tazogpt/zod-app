@@ -29,7 +29,7 @@ class JwtTokenProviderTest {
             level = 3,
         )
 
-        val claims = provider.parseClaims(token)
+        val claims = provider.parseAccessClaims(token)
 
         assertEquals("user-1", claims.subject)
         assertEquals("nick", claims["nickname"])
@@ -47,7 +47,7 @@ class JwtTokenProviderTest {
         )
 
         val ex = assertThrows(ApiException::class.java) {
-            provider.parseClaims(expiredToken)
+            provider.parseAccessClaims(expiredToken)
         }
 
         assertEquals(ErrorCode.TOKEN_EXPIRED, ex.errorCode)
@@ -62,7 +62,7 @@ class JwtTokenProviderTest {
             expiresAt = Instant.now().minusSeconds(60),
         )
 
-        val claims = provider.parseClaimsAllowExpired(expiredToken)
+        val claims = provider.parseRefreshClaimsAllowExpired(expiredToken)
 
         assertEquals("user-1", claims.subject)
     }
@@ -78,7 +78,7 @@ class JwtTokenProviderTest {
         )
 
         val ex = assertThrows(ApiException::class.java) {
-            provider.parseClaimsAllowExpired(invalidToken)
+            provider.parseRefreshClaimsAllowExpired(invalidToken)
         }
 
         assertEquals(ErrorCode.TOKEN_INVALID, ex.errorCode)
@@ -95,7 +95,7 @@ class JwtTokenProviderTest {
         )
 
         val ex = assertThrows(ApiException::class.java) {
-            provider.parseClaims(invalidToken)
+            provider.parseAccessClaims(invalidToken)
         }
 
         assertEquals(ErrorCode.TOKEN_INVALID, ex.errorCode)

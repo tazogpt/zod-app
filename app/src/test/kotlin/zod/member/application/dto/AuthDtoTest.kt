@@ -22,8 +22,9 @@ class AuthDtoTest {
 
     @Test
     fun `로그아웃 요청 DTO는 토큰 값을 보존한다`() {
-        val request = AuthDto.LogoutRequest("refresh")
+        val request = AuthDto.LogoutRequest("user-1", "refresh")
 
+        assertEquals("user-1", request.userid)
         assertEquals("refresh", request.refreshToken)
     }
 

@@ -8,6 +8,7 @@ class AuthDto {
     )
 
     data class LogoutRequest(
+        val userid: String,
         val refreshToken: String,
     )
 
